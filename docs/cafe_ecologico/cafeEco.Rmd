@@ -1,0 +1,397 @@
+---
+title: "OpenLand"
+subtitle: "Uma ferramenta livre para análise quantitativa de mudanças de uso e cobertura da terra (UCT)"
+author: "Réginal Exavier"
+talk_event: "Café Ecológico &#9749;"
+date: "14/05/2021"
+output:
+  xaringan::moon_reader:
+    css: 
+      - default
+      - assets/css/my-theme.css
+      - assets/css/my-fonts.css
+    lib_dir: libs
+    seal: false
+    self_contained: false
+    nature:
+      highlightStyle: googlecode
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: 16:9
+      #beforeInit: "macros.js"
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>
+---
+
+
+```{r setup, include = FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+library(tidyverse)
+library(xaringanExtra)
+library(OpenLand)
+library(icons)
+# set default options
+opts_chunk$set(echo = FALSE,
+               collapse = TRUE,
+               fig.width = 7.252,
+               fig.height = 4,
+               dpi = 300)
+# set engines
+knitr::knit_engines$set("markdown")
+xaringanExtra::use_tile_view()
+xaringanExtra::use_panelset()
+xaringanExtra::use_clipboard()
+xaringanExtra::use_webcam()
+xaringanExtra::use_broadcast()
+# xaringanExtra::use_share_again()
+# xaringanExtra::style_share_again(
+#   share_buttons = c("twitter", "linkedin", "pocket")
+# )
+# uncomment the following lines if you want to use the NHS-R theme colours by default
+# scale_fill_continuous <- partial(scale_fill_nhs, discrete = FALSE)
+# scale_fill_discrete <- partial(scale_fill_nhs, discrete = TRUE)
+# scale_colour_continuous <- partial(scale_colour_nhs, discrete = FALSE)
+# scale_colour_discrete <- partial(scale_colour_nhs, discrete = TRUE)
+```
+
+class: title-slide, midle, center
+background-image: url(img/hex-OpenLand.png), url(img/bg/curvy-line-jumping-colourful-cubes1.jpg)
+background-position: 50% 50%, 75% 75%
+background-size: 15%, cover
+
+
+# `r rmarkdown::metadata$title`<br>
+### `r rmarkdown::metadata$subtitle`<br><br><br><br><br><br><br><br>
+**`r rmarkdown::metadata$talk_event`**
+
+`r rmarkdown::metadata$author`
+
+`r rmarkdown::metadata$date`
+
+
+---
+class: inverse, center, middle
+
+# Contextualização <br> Historia do OpenLand
+
+---
+
+# Contextualização
+
+Aumento das taxas de mudança do uso e cobertura da terra (UCT)
+
+--
+
+Sustentação e compreensão dos processos de mudanças/transição de UCT
+  * Passados e em andamento
+  * Desenvolvimento de modelos
+
+--
+
+Processamento e análise de series espaço temporais de UCT
+  * Disponibilidade crescente de dados UCT provenientes de sensoriamento remoto
+  * Trabalho manual extenso para análise de conjuntos de grande volume
+
+--
+
+Métodos para quantificação de mudanças de UCT
+  * Formas de análise e visualização espaciais e não espaciais
+  * Análise de Intensidade
+
+--
+
+Ferramentas livres e de código aberto na análise e modelagem de mudanças de UCT
+
+
+---
+# Análise de Intensidade
+
+<p align="justify"> Ela consiste em cálculos sobre as matrizes de transições e permite medir e avaliar a intensidade das mudanças ocorridas na área de estudo em três níveis: <i>(i)</i> intervalo de tempo, <i>(ii)</i> categoria ou classe e <i>(iii)</i> transição. Ela compara a intensidade da mudança entre as categorias durante dois ou mais intervalos de tempo, comparando a mesma com uma intensidade uniforme da mudança hipotética (ALDWAIK; PONTIUS, 2012).</p>
+
+--
+
+<center><img src="img/tabela_equacao.jpg" width="900px"/></center>
+
+
+---
+# Análise de Intensidade
+<u>Nível de intervalo:</u> Em quais intervalos de tempo a taxa de variação anual global é relativamente lenta versus rápida?
+
+--
+
+  * Intensidade de variação anual para um dado intervalo de tempo:
+$$\begin{equation}
+S_t = \frac{área\ mudada\ no\ interválo\ \left[Y_{t}, Y_{t+1}\right]}{duração\ do\ interválo \left[Y_{t}, Y_{t+1}\right] * (área\ de\ estudo)} \times 100\% \\
+= 
+\frac{\sum_{j=1}^{J} \left[( \sum_{i=1}^{J} C_{tij}) - C_{tjj} \right]}{(Y_{t+1} - Y_{t})\left(\sum_{j=1}^{J} \sum_{i=1}^{J} C_{tij}\right)} \times 100\%
+\end{equation}$$
+
+--
+
+  * Intensidade uniforme:
+$$\begin{equation}
+U = \frac{área\ mudada\ em\ todos\ os\ intervalos\ \left[Y_{t}, Y_{t+1}\right]}{(duração\ de\ todos\ os\ interválos \left[Y_{t}, Y_{t+1}\right]) * (área\ de\ estudo)} \times 100\% \\
+= \frac{\sum_{t=1}^{T-1} \left\{(Y_{t+1} - Y_t) \sum_{j=1}^{J} \left[\left(\sum_{i=1}^{J} C_{tij}\right) - C_{tjj}   \right]\right\}}{(Y_{T} - Y_{1}) \sum_{t=1}^{T-1} \left[(Y_{t+1} - Y_t) \left(\sum_{j=1}^{J} \sum_{i=1}^{J} C_{tij}\right)  \right]} \times 100\%
+\end{equation}$$
+
+---
+# Análise de Intensidade
+<u>Nível de categoria:</u> Dada a resposta à pergunta 1, quais categorias são relativamente dormentes versus ativas em um dado intervalo de tempo, e esse padrão é estável em todos os intervalos de tempo?
+
+--
+
+  * Intensidade anual do ganho bruto de uma categoria $j$ em um determinado intervalo de tempo:
+$$\begin{equation}
+G_{tj} = \frac{ganho\ bruto\ da\ classe\ j\ durante\ \left[Y_{t},\ Y_{t+1}\right]}{(duração\ de\ \left[Y_{t},\ Y_{t+1}\right] ) * (área\ da\ categoria\ j\ no\ tempo\ Y_{t+1})}\times 100\% \\
+= \frac{\left[\left( \sum_{i=1}^{J} C_{tij} \right) - C_{tjj}   \right] / (Y_{t+1} - Y_t)}{\sum_{i=1}^{J} C_{tij}} \times 100\%
+\end{equation}$$
+
+--
+
+  * Intensidade anual da perda bruta de uma categoria $i$ em um dado intervalo de tempo:
+$$\begin{equation}
+L_{ti} = \frac{perda\ bruta\ da\ classe\ i\ durante\ \left[Y_{t},\ Y_{t+1}\right]}{(duração\ de\ \left[Y_{t},\ Y_{t+1}\right] ) * (área\ da\ categoria\ i\ no\ tempo\ Y_{t}} \times 100\% \\
+= \frac{\left[\left( \sum_{j=1}^{J} C_{tij} \right) - C_{tii}   \right] / (Y_{t+1} - Y_t)}{\sum_{j=1}^{J} C_{tij}} \times 100\%
+\end{equation}$$
+
+
+---
+# Análise de Intensidade
+<u>Nível de transição:</u> Dadas as respostas às perguntas 1 e 2, quais transições são intensamente evitadas versus direcionadas por uma determinada categoria em um determinado intervalo de tempo, e esse padrão é estável ao longo de intervalos de tempo?
+
+--
+
+  * Intensidade anual de transição de uma categoria $i$ para uma categoria $n$ em um dado intervalo de tempo:
+$$\begin{equation}
+R_{tin} = \frac{área\ de\ transição\ da\ classe\ i\ para\ n\ durante\  \left[Y_{t},\ Y_{t+1}\right]}{(duração\ de\ \left[Y_{t},\ Y_{t+1}\right] ) * (área\ da\ classe\ i\ no\ tempo\ Y_{t})} \times 100\% \\
+= \frac{C_{tin} / (Y_{t+1} - Y_t)}{\sum_{j=1}^{J} C_{tij}} \times 100\%
+\end{equation}$$
+
+--
+
+  * Intensidade uniforme de transição de todas as categorias não- $n$ para uma categoria $n$ em um dado intervalo de tempo:
+$$\begin{equation}
+W_{tn} = \frac{ganho\ bruto\ da\ classe\ n\ durante\ \left[Y_{t},\ Y_{t+1}\right]}{(duração\ de\ \left[Y_{t},\ Y_{t+1}\right] ) * (área\ que\ não\ é\ da\ classe\ n\ no\ tempo\ Y_{t})} \times 100\% \\
+=\frac{\left[\left( \sum_{i=1}^{J} C_{tin} \right) - C_{tnn}   \right] / (Y_{t+1} - Y_t)}{\sum_{j=1}^{J}  \left[\left( \sum_{i=1}^{J} C_{tij} \right) - C_{tnj}   \right]} \times 100\%
+\end{equation}$$
+
+
+---
+# Análise de Intensidade
+<u>Nível de transição:</u> Dadas as respostas às perguntas 1 e 2, quais transições são intensamente evitadas versus direcionadas por uma determinada categoria em um determinado intervalo de tempo, e esse padrão é estável ao longo de intervalos de tempo?
+
+--
+
+* Intensidade anual de transição de uma categoria $m$ para uma categoria $j$ em um dado intervalo de tempo:
+$$\begin{equation}
+Q_{tmj} = \frac{área\ de\ transição\ da\ classe\ m\ para\ j\ durante\  \left[Y_{t},\ Y_{t+1}\right]}{(duração\ de\ \left[Y_{t},\ Y_{t+1}\right] ) * (área\ da\ classe\ j\ no\ tempo\ Y_{t+1})} \times 100\% \\
+= \frac{C_{tmj} / (Y_{t+1} - Y_t)}{\sum_{i=1}^{J} C_{tij}} \times 100\%
+\end{equation}$$
+
+--
+* Intensidade uniforme de transição de todas as categorias não- $m$ para uma categoria $m$ em um determinado intervalo de tempo:
+$$\begin{equation}
+V_{tm}= \frac{perda\ bruta\ da\ classe\ m\ durante\ \left[Y_{t},\ Y_{t+1}\right]}{(duração\ de\ \left[Y_{t},\ Y_{t+1}\right] ) * (área\ que\ não\ é\ da\ classe\ m\ no\ tempo\ Y_{t+1})} \times 100\% \\
+= \frac{\left[\left( \sum_{j=1}^{J} C_{tmj} \right) - C_{tmm}   \right] / (Y_{t+1} - Y_t)}{\sum_{i=1}^{J}  \left[\left( \sum_{j=1}^{J} C_{tij} \right) - C_{tim}   \right]} \times 100\%
+\end{equation}$$
+
+---
+# Exemplo de uma série de UCT
+
+.panelset[
+.panel[.panel-name[Raster 5x5 pixels]
+.center[<img src="img/rasters_series_sample.png" style="width:40%;height:40%;"/>]]
+.panel[.panel-name[Matriz com posição 𝑖 e 𝑗]
+.middle[<img src="img/serie_matrix.png" style="width:100%;height:100%;"/>]
+]
+]
+
+
+---
+class: inverse, middle
+
+background-image: url(img/logo_OpenLand.png)
+background-size: 200px
+background-position: 5% 55%
+
+.right-column[OpenLand é um pacote R de código aberto para a análise de séries temporais de uso e cobertura da terra (UCT). Ele inclui suporte para verificação de consistência e carregamento de dados raster espaço-temporais e plotagem espacial sintetizada.
+
+- Versões publicadas<br> no CRAN:
+   * `1.0.0 :` 23/03/2020
+   * `1.0.1 :` 19/04/2020]
+
+---
+# Visão geral e conceitual do OpenLand
+
+<center><img src="img/fluxograma.png" style="width:78%;height:78%;"/></center>
+
+
+---
+# OpenLand (página online)
+
+```{r}
+knitr::include_url("https://reginalexavier.github.io/OpenLand/index.html",
+                   height = "550px")
+
+```
+
+
+
+---
+background-image: url(img/tabela_de_contingencia.png)
+background-size: 900px
+background-position: 50% 50%
+# Tabela de contingencia
+
+Essa é a estrutura padrão adotada para as tabelas de contingencias dentro do OpenLand
+
+
+
+---
+
+```{r include=FALSE}
+library(OpenLand)
+library(here)
+```
+
+
+#Estudo de caso
+.panelset[
+.panel[.panel-name[Bacia do Rio São Lourenço - MT]
+A funcionalidade do pacote OpenLand é demonstrada usando um conjunto de dados de UCT da bacia do rio São Lourenço (MT), que é um dos principais afluentes do Pantanal setentrional. Os dados usados são provenientes da 4ª edição do Monitoramento de Mudanças na Cobertura e Uso da Terra na Bacia do Alto Paraguai - porção brasileira - Período de Revisão: 2012 a 2014 [(INSTITUTO SOS PANTANAL; WWF-BRASIL, 2015)](https://www.embrapa.br/documents/1354999/1529097/BAP+-+Mapeamento+da+Bacia+do+Alto+Paraguai+-+estudo+completo/e66e3afb-2334-4511-96a0-af5642a56283) e a série temporal é composta por cinco rasters de UCT: 2002, 2008, 2010, 2012 e 2014.
+
+<br>
+
+A área de estudo está localizada no bioma Cerrado, na porção sudeste do
+estado de Mato Grosso e abrange aproximadamente 22.400 km2. Durante o período
+de 12 anos de avaliação ocorreram mudanças de UCT em cerca de 12% da sua área,
+incluindo desmatamento e intensificação dos usos agrícolas existentes.
+] <!--end of panel-->
+.panel[.panel-name[Classes de UCT da bacia]
+.center[<img src="img/tabela_classes_uct.png" style="width:95%;height:95%;"/>]
+
+<small> [(INSTITUTO SOS PANTANAL; WWF-BRASIL, 2015)](https://www.embrapa.br/pantanal/bacia-do-alto-paraguai) </small>
+] <!--end of panel-->
+] <!--end of panelset-->
+
+---
+# Tabela de contingencia _(OpenLand)_ 
+
+
+```{r echo=FALSE}
+SL_2002_2014$lulc_Multistep %>% head(12) %>% 
+  knitr::kable(format = "html")
+```
+---
+
+# Mudanças ao longo do tempo da análise
+.panelset[
+.panel[.panel-name[Evolução]
+.center[<img src="img/barplotLand.png" style="width:70%;height:70%px;"/>]
+] <!--end of panel-->
+.panel[.panel-name[Mudanças brutas e liquídas]
+.center[<img src="img/net_gross.png" style="width:70%;height:70%px;"/>]
+] <!--end of panel-->
+] <!--end of panelset-->
+
+
+---
+
+# Análise de Intensidade
+.panelset[
+.panel[.panel-name[Nivel de Intervalo]
+.center[<img src="img/interval_lvl.png" style="width:68%;height:68%¨;"/>]
+] <!--end of panel-->
+.panel[.panel-name[Nivel de Categoria]
+<br>
+.pull-left[<img src="img/category_lvlGain.png" style="width:95%;height:95%px;"/>]
+.pull-right[<img src="img/category_lvlLoss.png" style="width:95%;height:95%px;"/>]
+] <!--end of panel-->
+.panel[.panel-name[Nivel de Transição]
+<br>
+.pull-left[<img src="img/transition_lvlGain_n.png" style="width:95%;height:95%px;"/>]
+.pull-right[<img src="img/transition_lvlLoss_m.png" style="width:95%;height:95%px;"/>]
+] <!--end of panel-->
+] <!--end of panelset-->
+
+
+---
+
+# Diagramas de transição
+.panelset[
+.panel[.panel-name[Chord Diagram]
+.center[<img src="img/chordDiagram.png" style="width:57%;height:57%;"/>]
+] <!--end of panel-->
+.panel[.panel-name[Sankey one-step]
+.center[<img src="img/sankey_mono.png" style="width:500px;height:495px;"/>]
+] <!--end of panel-->
+.panel[.panel-name[Sankey multi-step]
+.center[<img src="img/sankey_multi.png" style="width:500px;height:495px;"/>]
+] <!--end of panel-->
+] <!--end of panelset-->
+
+
+---
+# Mapas das mudanças
+.panelset[
+.panel[.panel-name[Acumuladas]
+.center[<img src="img/acc_mymap.png" style="width:50%;height:50%px;"/>]
+] <!--end of panel-->
+.panel[.panel-name[Ganhos de áreas]
+.center[<img src="img/gain_map.png" style="width:50%;height:50%px;"/>]
+] <!--end of panel-->
+.panel[.panel-name[Perdas de áreas]
+.center[<img src="img/loss_map.png" style="width:50%;height:50%px;"/>]
+] <!--end of panel-->
+] <!--end of panelset-->
+
+
+---
+# Performance
+
+<center><img src="img/performance.png" style="width:70%;height:70%;"/></center>
+
+
+
+20 conjuntos | 10 camadas de rasters | 500 iterações por conjuntos | 10.000 permutações testadas |
+O tempo de processamento na função `contingencyTable()` possui relação positiva linear com as duas
+variáveis alteradas.
+
+
+---
+# Referências
+
+ALDWAIK, S. Z.; PONTIUS, R. G. Intensity analysis to unify measurements of size and stationarity of land changes by interval, category, and transition. Landscape and Urban Planning, v. 106, n. 1, p. 103–114, 2012. https://doi.org/10.1016/j.landurbplan.2012.02.010.
+
+EMBRAPA PANTANAL; INSTITUTO SOS PANTANAL; WWF-BRASIL. Mapeamento da Bacia do Alto Paraguai. Disponível em: https://www.embrapa.br/pantanal/bacia-do-alto-paraguai. Acesso em: 22 ago. 2020.
+
+EMBRAPA PANTANAL; INSTITUTO SOS PANTANAL; WWF-BRASIL. 2015. Monitoramento das alterações da cobertura vegetal e uso do Solo na Bacia do Alto Paraguai – Porção Brasileira – Período de Análise: 2012 a 2014. 4th ed. Brasilia. https://www.embrapa.br/documents/1354999/1529097/BAP+-+Mapeamento+da+Bacia+do+Alto+Paraguai+-+estudo+completo/e66e3afb-2334-4511-96a0-af5642a56283.
+
+EXAVIER, R.; ZEILHOFER, P. CRAN - Package OpenLand: Quantitative Analysis and Visualization of LUCC, 2020. https://cran.r-project.org/package=OpenLand.
+
+EXAVIER, R.; ZEILHOFER, P. OpenLand: Software for Quantitative Analysis and Visualization of Land Use and Cover Change. The R Journal, v. 12, n. 2, p. 359–371, 2021. https://journal.r-project.org/archive/2021/RJ-2021-021/index.html
+
+---
+
+class: clear, center, middle
+
+
+<br><br><br>
+## <center>Réginal Exavier</center>
+
+`r emo::ji("envelope")` [reginalexavier@rocketmail.com](reginalexavier@usp.com.br)
+<br>
+GitHub: [@reginalexavier](https://github.com/reginalexavier)
+<br>
+
+## <center>Obrigado!</center>
+
+<br>
+
+
+Slides criados via pacote [xaringan](https://github.com/yihui/xaringan) e tema baseada em  [Alison Presmanes Hill](https://alison.rbind.io/)
+

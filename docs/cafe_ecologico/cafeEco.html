@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>OpenLand</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Réginal Exavier" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/clipboard/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <script src="libs/xaringanExtra-webcam/webcam.js"></script>
+    <script id="xaringanExtra-webcam-options" type="application/json">{"width":"200","height":"200","margin":"1em"}</script>
+    <script src="libs/js-cookie/js.cookie.js"></script>
+    <script src="libs/peerjs/peerjs.min.js"></script>
+    <script src="libs/tiny.toast/toast.min.js"></script>
+    <link href="libs/xaringanExtra-broadcast/broadcast.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-broadcast/broadcast.js"></script>
+    <link rel="stylesheet" href="assets/css/my-theme.css" type="text/css" />
+    <link rel="stylesheet" href="assets/css/my-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+class: title-slide, midle, center
+background-image: url(img/hex-OpenLand.png), url(img/bg/curvy-line-jumping-colourful-cubes1.jpg)
+background-position: 50% 50%, 75% 75%
+background-size: 15%, cover
+
+
+# OpenLand&lt;br&gt;
+### Uma ferramenta livre para análise quantitativa de mudanças de uso e cobertura da terra (UCT)&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
+**Café Ecológico &amp;#9749;**
+
+Réginal Exavier
+
+14/05/2021
+
+
+---
+class: inverse, center, middle
+
+# Contextualização &lt;br&gt; Historia do OpenLand
+
+---
+
+# Contextualização
+
+Aumento das taxas de mudança do uso e cobertura da terra (UCT)
+
+--
+
+Sustentação e compreensão dos processos de mudanças/transição de UCT
+  * Passados e em andamento
+  * Desenvolvimento de modelos
+
+--
+
+Processamento e análise de series espaço temporais de UCT
+  * Disponibilidade crescente de dados UCT provenientes de sensoriamento remoto
+  * Trabalho manual extenso para análise de conjuntos de grande volume
+
+--
+
+Métodos para quantificação de mudanças de UCT
+  * Formas de análise e visualização espaciais e não espaciais
+  * Análise de Intensidade
+
+--
+
+Ferramentas livres e de código aberto na análise e modelagem de mudanças de UCT
+
+
+---
+# Análise de Intensidade
+
+&lt;p align="justify"&gt; Ela consiste em cálculos sobre as matrizes de transições e permite medir e avaliar a intensidade das mudanças ocorridas na área de estudo em três níveis: &lt;i&gt;(i)&lt;/i&gt; intervalo de tempo, &lt;i&gt;(ii)&lt;/i&gt; categoria ou classe e &lt;i&gt;(iii)&lt;/i&gt; transição. Ela compara a intensidade da mudança entre as categorias durante dois ou mais intervalos de tempo, comparando a mesma com uma intensidade uniforme da mudança hipotética (ALDWAIK; PONTIUS, 2012).&lt;/p&gt;
+
+--
+
+&lt;center&gt;&lt;img src="img/tabela_equacao.jpg" width="900px"/&gt;&lt;/center&gt;
+
+
+---
+# Análise de Intensidade
+&lt;u&gt;Nível de intervalo:&lt;/u&gt; Em quais intervalos de tempo a taxa de variação anual global é relativamente lenta versus rápida?
+
+--
+
+  * Intensidade de variação anual para um dado intervalo de tempo:
+`$$\begin{equation}
+S_t = \frac{área\ mudada\ no\ interválo\ \left[Y_{t}, Y_{t+1}\right]}{duração\ do\ interválo \left[Y_{t}, Y_{t+1}\right] * (área\ de\ estudo)} \times 100\% \\
+= 
+\frac{\sum_{j=1}^{J} \left[( \sum_{i=1}^{J} C_{tij}) - C_{tjj} \right]}{(Y_{t+1} - Y_{t})\left(\sum_{j=1}^{J} \sum_{i=1}^{J} C_{tij}\right)} \times 100\%
+\end{equation}$$`
+
+--
+
+  * Intensidade uniforme:
+`$$\begin{equation}
+U = \frac{área\ mudada\ em\ todos\ os\ intervalos\ \left[Y_{t}, Y_{t+1}\right]}{(duração\ de\ todos\ os\ interválos \left[Y_{t}, Y_{t+1}\right]) * (área\ de\ estudo)} \times 100\% \\
+= \frac{\sum_{t=1}^{T-1} \left\{(Y_{t+1} - Y_t) \sum_{j=1}^{J} \left[\left(\sum_{i=1}^{J} C_{tij}\right) - C_{tjj}   \right]\right\}}{(Y_{T} - Y_{1}) \sum_{t=1}^{T-1} \left[(Y_{t+1} - Y_t) \left(\sum_{j=1}^{J} \sum_{i=1}^{J} C_{tij}\right)  \right]} \times 100\%
+\end{equation}$$`
+
+---
+# Análise de Intensidade
+&lt;u&gt;Nível de categoria:&lt;/u&gt; Dada a resposta à pergunta 1, quais categorias são relativamente dormentes versus ativas em um dado intervalo de tempo, e esse padrão é estável em todos os intervalos de tempo?
+
+--
+
+  * Intensidade anual do ganho bruto de uma categoria `\(j\)` em um determinado intervalo de tempo:
+`$$\begin{equation}
+G_{tj} = \frac{ganho\ bruto\ da\ classe\ j\ durante\ \left[Y_{t},\ Y_{t+1}\right]}{(duração\ de\ \left[Y_{t},\ Y_{t+1}\right] ) * (área\ da\ categoria\ j\ no\ tempo\ Y_{t+1})}\times 100\% \\
+= \frac{\left[\left( \sum_{i=1}^{J} C_{tij} \right) - C_{tjj}   \right] / (Y_{t+1} - Y_t)}{\sum_{i=1}^{J} C_{tij}} \times 100\%
+\end{equation}$$`
+
+--
+
+  * Intensidade anual da perda bruta de uma categoria `\(i\)` em um dado intervalo de tempo:
+`$$\begin{equation}
+L_{ti} = \frac{perda\ bruta\ da\ classe\ i\ durante\ \left[Y_{t},\ Y_{t+1}\right]}{(duração\ de\ \left[Y_{t},\ Y_{t+1}\right] ) * (área\ da\ categoria\ i\ no\ tempo\ Y_{t}} \times 100\% \\
+= \frac{\left[\left( \sum_{j=1}^{J} C_{tij} \right) - C_{tii}   \right] / (Y_{t+1} - Y_t)}{\sum_{j=1}^{J} C_{tij}} \times 100\%
+\end{equation}$$`
+
+
+---
+# Análise de Intensidade
+&lt;u&gt;Nível de transição:&lt;/u&gt; Dadas as respostas às perguntas 1 e 2, quais transições são intensamente evitadas versus direcionadas por uma determinada categoria em um determinado intervalo de tempo, e esse padrão é estável ao longo de intervalos de tempo?
+
+--
+
+  * Intensidade anual de transição de uma categoria `\(i\)` para uma categoria `\(n\)` em um dado intervalo de tempo:
+`$$\begin{equation}
+R_{tin} = \frac{área\ de\ transição\ da\ classe\ i\ para\ n\ durante\  \left[Y_{t},\ Y_{t+1}\right]}{(duração\ de\ \left[Y_{t},\ Y_{t+1}\right] ) * (área\ da\ classe\ i\ no\ tempo\ Y_{t})} \times 100\% \\
+= \frac{C_{tin} / (Y_{t+1} - Y_t)}{\sum_{j=1}^{J} C_{tij}} \times 100\%
+\end{equation}$$`
+
+--
+
+  * Intensidade uniforme de transição de todas as categorias não- `\(n\)` para uma categoria `\(n\)` em um dado intervalo de tempo:
+`$$\begin{equation}
+W_{tn} = \frac{ganho\ bruto\ da\ classe\ n\ durante\ \left[Y_{t},\ Y_{t+1}\right]}{(duração\ de\ \left[Y_{t},\ Y_{t+1}\right] ) * (área\ que\ não\ é\ da\ classe\ n\ no\ tempo\ Y_{t})} \times 100\% \\
+=\frac{\left[\left( \sum_{i=1}^{J} C_{tin} \right) - C_{tnn}   \right] / (Y_{t+1} - Y_t)}{\sum_{j=1}^{J}  \left[\left( \sum_{i=1}^{J} C_{tij} \right) - C_{tnj}   \right]} \times 100\%
+\end{equation}$$`
+
+
+---
+# Análise de Intensidade
+&lt;u&gt;Nível de transição:&lt;/u&gt; Dadas as respostas às perguntas 1 e 2, quais transições são intensamente evitadas versus direcionadas por uma determinada categoria em um determinado intervalo de tempo, e esse padrão é estável ao longo de intervalos de tempo?
+
+--
+
+* Intensidade anual de transição de uma categoria `\(m\)` para uma categoria `\(j\)` em um dado intervalo de tempo:
+`$$\begin{equation}
+Q_{tmj} = \frac{área\ de\ transição\ da\ classe\ m\ para\ j\ durante\  \left[Y_{t},\ Y_{t+1}\right]}{(duração\ de\ \left[Y_{t},\ Y_{t+1}\right] ) * (área\ da\ classe\ j\ no\ tempo\ Y_{t+1})} \times 100\% \\
+= \frac{C_{tmj} / (Y_{t+1} - Y_t)}{\sum_{i=1}^{J} C_{tij}} \times 100\%
+\end{equation}$$`
+
+--
+* Intensidade uniforme de transição de todas as categorias não- `\(m\)` para uma categoria `\(m\)` em um determinado intervalo de tempo:
+`$$\begin{equation}
+V_{tm}= \frac{perda\ bruta\ da\ classe\ m\ durante\ \left[Y_{t},\ Y_{t+1}\right]}{(duração\ de\ \left[Y_{t},\ Y_{t+1}\right] ) * (área\ que\ não\ é\ da\ classe\ m\ no\ tempo\ Y_{t+1})} \times 100\% \\
+= \frac{\left[\left( \sum_{j=1}^{J} C_{tmj} \right) - C_{tmm}   \right] / (Y_{t+1} - Y_t)}{\sum_{i=1}^{J}  \left[\left( \sum_{j=1}^{J} C_{tij} \right) - C_{tim}   \right]} \times 100\%
+\end{equation}$$`
+
+---
+# Exemplo de uma série de UCT
+
+.panelset[
+.panel[.panel-name[Raster 5x5 pixels]
+.center[&lt;img src="img/rasters_series_sample.png" style="width:40%;height:40%;"/&gt;]]
+.panel[.panel-name[Matriz com posição 𝑖 e 𝑗]
+.middle[&lt;img src="img/serie_matrix.png" style="width:100%;height:100%;"/&gt;]
+]
+]
+
+
+---
+class: inverse, middle
+
+background-image: url(img/logo_OpenLand.png)
+background-size: 200px
+background-position: 5% 55%
+
+.right-column[OpenLand é um pacote R de código aberto para a análise de séries temporais de uso e cobertura da terra (UCT). Ele inclui suporte para verificação de consistência e carregamento de dados raster espaço-temporais e plotagem espacial sintetizada.
+
+- Versões publicadas&lt;br&gt; no CRAN:
+   * `1.0.0 :` 23/03/2020
+   * `1.0.1 :` 19/04/2020]
+
+---
+# Visão geral e conceitual do OpenLand
+
+&lt;center&gt;&lt;img src="img/fluxograma.png" style="width:78%;height:78%;"/&gt;&lt;/center&gt;
+
+
+---
+# OpenLand (página online)
+
+&lt;iframe src="https://reginalexavier.github.io/OpenLand/index.html" width="100%" height="550px"&gt;&lt;/iframe&gt;
+
+
+
+---
+background-image: url(img/tabela_de_contingencia.png)
+background-size: 900px
+background-position: 50% 50%
+# Tabela de contingencia
+
+Essa é a estrutura padrão adotada para as tabelas de contingencias dentro do OpenLand
+
+
+
+---
+
+
+
+
+#Estudo de caso
+.panelset[
+.panel[.panel-name[Bacia do Rio São Lourenço - MT]
+A funcionalidade do pacote OpenLand é demonstrada usando um conjunto de dados de UCT da bacia do rio São Lourenço (MT), que é um dos principais afluentes do Pantanal setentrional. Os dados usados são provenientes da 4ª edição do Monitoramento de Mudanças na Cobertura e Uso da Terra na Bacia do Alto Paraguai - porção brasileira - Período de Revisão: 2012 a 2014 [(INSTITUTO SOS PANTANAL; WWF-BRASIL, 2015)](https://www.embrapa.br/documents/1354999/1529097/BAP+-+Mapeamento+da+Bacia+do+Alto+Paraguai+-+estudo+completo/e66e3afb-2334-4511-96a0-af5642a56283) e a série temporal é composta por cinco rasters de UCT: 2002, 2008, 2010, 2012 e 2014.
+
+&lt;br&gt;
+
+A área de estudo está localizada no bioma Cerrado, na porção sudeste do
+estado de Mato Grosso e abrange aproximadamente 22.400 km2. Durante o período
+de 12 anos de avaliação ocorreram mudanças de UCT em cerca de 12% da sua área,
+incluindo desmatamento e intensificação dos usos agrícolas existentes.
+] &lt;!--end of panel--&gt;
+.panel[.panel-name[Classes de UCT da bacia]
+.center[&lt;img src="img/tabela_classes_uct.png" style="width:95%;height:95%;"/&gt;]
+
+&lt;small&gt; [(INSTITUTO SOS PANTANAL; WWF-BRASIL, 2015)](https://www.embrapa.br/pantanal/bacia-do-alto-paraguai) &lt;/small&gt;
+] &lt;!--end of panel--&gt;
+] &lt;!--end of panelset--&gt;
+
+---
+# Tabela de contingencia _(OpenLand)_ 
+
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Period &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; From &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; To &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; km2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; QtPixel &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Interval &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; yearFrom &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; yearTo &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-2008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6542.9649 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7269961 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2008 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-2008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.5624 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1736 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2008 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-2008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 55.1880 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 61320 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2008 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-2008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.9481 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26609 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2008 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-2008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 37.4841 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 41649 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2008 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-2008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2133.1710 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2370190 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2008 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-2008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 155.4462 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 172718 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2008 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-2008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.4763 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8307 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2008 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-2008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.3555 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 395 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2008 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-2008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0810 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2008 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-2008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65.8350 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73150 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2008 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-2008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1547.0847 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1718983 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2008 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+# Mudanças ao longo do tempo da análise
+.panelset[
+.panel[.panel-name[Evolução]
+.center[&lt;img src="img/barplotLand.png" style="width:70%;height:70%px;"/&gt;]
+] &lt;!--end of panel--&gt;
+.panel[.panel-name[Mudanças brutas e liquídas]
+.center[&lt;img src="img/net_gross.png" style="width:70%;height:70%px;"/&gt;]
+] &lt;!--end of panel--&gt;
+] &lt;!--end of panelset--&gt;
+
+
+---
+
+# Análise de Intensidade
+.panelset[
+.panel[.panel-name[Nivel de Intervalo]
+.center[&lt;img src="img/interval_lvl.png" style="width:68%;height:68%¨;"/&gt;]
+] &lt;!--end of panel--&gt;
+.panel[.panel-name[Nivel de Categoria]
+&lt;br&gt;
+.pull-left[&lt;img src="img/category_lvlGain.png" style="width:95%;height:95%px;"/&gt;]
+.pull-right[&lt;img src="img/category_lvlLoss.png" style="width:95%;height:95%px;"/&gt;]
+] &lt;!--end of panel--&gt;
+.panel[.panel-name[Nivel de Transição]
+&lt;br&gt;
+.pull-left[&lt;img src="img/transition_lvlGain_n.png" style="width:95%;height:95%px;"/&gt;]
+.pull-right[&lt;img src="img/transition_lvlLoss_m.png" style="width:95%;height:95%px;"/&gt;]
+] &lt;!--end of panel--&gt;
+] &lt;!--end of panelset--&gt;
+
+
+---
+
+# Diagramas de transição
+.panelset[
+.panel[.panel-name[Chord Diagram]
+.center[&lt;img src="img/chordDiagram.png" style="width:57%;height:57%;"/&gt;]
+] &lt;!--end of panel--&gt;
+.panel[.panel-name[Sankey one-step]
+.center[&lt;img src="img/sankey_mono.png" style="width:500px;height:495px;"/&gt;]
+] &lt;!--end of panel--&gt;
+.panel[.panel-name[Sankey multi-step]
+.center[&lt;img src="img/sankey_multi.png" style="width:500px;height:495px;"/&gt;]
+] &lt;!--end of panel--&gt;
+] &lt;!--end of panelset--&gt;
+
+
+---
+# Mapas das mudanças
+.panelset[
+.panel[.panel-name[Acumuladas]
+.center[&lt;img src="img/acc_mymap.png" style="width:50%;height:50%px;"/&gt;]
+] &lt;!--end of panel--&gt;
+.panel[.panel-name[Ganhos de áreas]
+.center[&lt;img src="img/gain_map.png" style="width:50%;height:50%px;"/&gt;]
+] &lt;!--end of panel--&gt;
+.panel[.panel-name[Perdas de áreas]
+.center[&lt;img src="img/loss_map.png" style="width:50%;height:50%px;"/&gt;]
+] &lt;!--end of panel--&gt;
+] &lt;!--end of panelset--&gt;
+
+
+---
+# Performance
+
+&lt;center&gt;&lt;img src="img/performance.png" style="width:70%;height:70%;"/&gt;&lt;/center&gt;
+
+
+
+20 conjuntos | 10 camadas de rasters | 500 iterações por conjuntos | 10.000 permutações testadas |
+O tempo de processamento na função `contingencyTable()` possui relação positiva linear com as duas
+variáveis alteradas.
+
+
+---
+# Referências
+
+ALDWAIK, S. Z.; PONTIUS, R. G. Intensity analysis to unify measurements of size and stationarity of land changes by interval, category, and transition. Landscape and Urban Planning, v. 106, n. 1, p. 103–114, 2012. https://doi.org/10.1016/j.landurbplan.2012.02.010.
+
+EMBRAPA PANTANAL; INSTITUTO SOS PANTANAL; WWF-BRASIL. Mapeamento da Bacia do Alto Paraguai. Disponível em: https://www.embrapa.br/pantanal/bacia-do-alto-paraguai. Acesso em: 22 ago. 2020.
+
+EMBRAPA PANTANAL; INSTITUTO SOS PANTANAL; WWF-BRASIL. 2015. Monitoramento das alterações da cobertura vegetal e uso do Solo na Bacia do Alto Paraguai – Porção Brasileira – Período de Análise: 2012 a 2014. 4th ed. Brasilia. https://www.embrapa.br/documents/1354999/1529097/BAP+-+Mapeamento+da+Bacia+do+Alto+Paraguai+-+estudo+completo/e66e3afb-2334-4511-96a0-af5642a56283.
+
+EXAVIER, R.; ZEILHOFER, P. CRAN - Package OpenLand: Quantitative Analysis and Visualization of LUCC, 2020. https://cran.r-project.org/package=OpenLand.
+
+EXAVIER, R.; ZEILHOFER, P. OpenLand: Software for Quantitative Analysis and Visualization of Land Use and Cover Change. The R Journal, v. 12, n. 2, p. 359–371, 2021. https://journal.r-project.org/archive/2021/RJ-2021-021/index.html
+
+---
+
+class: clear, center, middle
+
+
+&lt;br&gt;&lt;br&gt;&lt;br&gt;
+## &lt;center&gt;Réginal Exavier&lt;/center&gt;
+
+✉️ [reginalexavier@rocketmail.com](reginalexavier@usp.com.br)
+&lt;br&gt;
+GitHub: [@reginalexavier](https://github.com/reginalexavier)
+&lt;br&gt;
+
+## &lt;center&gt;Obrigado!&lt;/center&gt;
+
+&lt;br&gt;
+
+
+Slides criados via pacote [xaringan](https://github.com/yihui/xaringan) e tema baseada em  [Alison Presmanes Hill](https://alison.rbind.io/)
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "googlecode",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
